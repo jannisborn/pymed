@@ -2,14 +2,14 @@ from typing import TypeVar
 
 
 def batches(iterable: list, n: int = 1) -> list:
-    """ Helper method that creates batches from an iterable.
+    """Helper method that creates batches from an iterable.
 
-        Parameters:
-            - iterable      Iterable, the iterable to batch.
-            - n             Int, the batch size.
+    Parameters:
+        - iterable      Iterable, the iterable to batch.
+        - n             Int, the batch size.
 
-        Returns:
-            - batches       List, yields batches of n objects taken from the iterable.
+    Returns:
+        - batches       List, yields batches of n objects taken from the iterable.
     """
 
     # Get the length of the iterable
@@ -25,16 +25,16 @@ def batches(iterable: list, n: int = 1) -> list:
 def getContent(
     element: TypeVar("Element"), path: str, default: str = None, separator: str = "\n"
 ) -> str:
-    """ Internal helper method that retrieves the text content of an
-        XML element.
+    """Internal helper method that retrieves the text content of an
+    XML element.
 
-        Parameters:
-            - element   Element, the XML element to parse.
-            - path      Str, Nested path in the XML element.
-            - default   Str, default value to return when no text is found.
+    Parameters:
+        - element   Element, the XML element to parse.
+        - path      Str, Nested path in the XML element.
+        - default   Str, default value to return when no text is found.
 
-        Returns:
-            - text      Str, text in the XML node.
+    Returns:
+        - text      Str, text in the XML node.
     """
 
     # Find the path in the element

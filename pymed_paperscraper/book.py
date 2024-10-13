@@ -1,15 +1,12 @@
-import json
 import datetime
-
-from typing import TypeVar
-from typing import Optional
+import json
+from typing import Optional, TypeVar
 
 from .helpers import getContent
 
 
 class PubMedBookArticle(object):
-    """ Data class that contains a PubMed article.
-    """
+    """Data class that contains a PubMed article."""
 
     __slots__ = (
         "pubmed_id",
@@ -33,8 +30,7 @@ class PubMedBookArticle(object):
         *args: list,
         **kwargs: dict,
     ) -> None:
-        """ Initialization of the object from XML or from parameters.
-        """
+        """Initialization of the object from XML or from parameters."""
 
         # If an XML element is provided, use it for initialization
         if xml_element is not None:
@@ -110,8 +106,7 @@ class PubMedBookArticle(object):
         ]
 
     def _initializeFromXML(self: object, xml_element: TypeVar("Element")) -> None:
-        """ Helper method that parses an XML element into an article object.
-        """
+        """Helper method that parses an XML element into an article object."""
 
         # Parse the different fields of the article
         self.pubmed_id = self._extractPubMedId(xml_element)
@@ -129,8 +124,7 @@ class PubMedBookArticle(object):
         self.sections = self._extractSections(xml_element)
 
     def toDict(self: object) -> dict:
-        """ Helper method to convert the parsed information to a Python dict.
-        """
+        """Helper method to convert the parsed information to a Python dict."""
 
         return {
             key: (self.__getattribute__(key) if hasattr(self, key) else None)
@@ -138,8 +132,7 @@ class PubMedBookArticle(object):
         }
 
     def toJSON(self: object) -> str:
-        """ Helper method for debugging, dumps the object as JSON string.
-        """
+        """Helper method for debugging, dumps the object as JSON string."""
 
         return json.dumps(
             {
