@@ -1,4 +1,4 @@
-> IMPORTANT NOTE: I don't have time to maintain this library (as some of you might have noticed). The PubMed API is a little chaotic, without a clear documentation and no single way of doing things, making it almost impossible to create a proper library. Feel free to create a fork or use the code for your own projects, however, I will archive this repository. Thanks to all contributers and users!
+NOTE: This is a user-maintained extension of the [pymed](https://pypi.org/project/pymed/) project which was [archived in 2020](https://github.com/gijswobben/pymed). Some bugs in `pymed` are fixed here. This package can be installed via `pip install pymed-paperscraper` since I forked it to support [`paperscraper`](https://github.com/jannisborn/paperscraper).
 
 # PyMed - PubMed Access through Python
 PyMed is a Python library that provides access to PubMed through the PubMed API.
