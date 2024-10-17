@@ -1,13 +1,20 @@
 import datetime
 import itertools
+import logging
+import sys
 import xml.etree.ElementTree as xml
+from time import sleep
 from typing import Union
 
 import requests
+from tqdm import tqdm
 
 from .article import PubMedArticle
 from .book import PubMedBookArticle
 from .helpers import batches
+
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Base url for all queries
 BASE_URL = "https://eutils.ncbi.nlm.nih.gov"
@@ -17,7 +24,11 @@ class PubMed(object):
     """Wrapper around the PubMed API."""
 
     def __init__(
-        self: object, tool: str = "my_tool", email: str = "my_email@example.com"
+        self: object,
+        tool: str = "my_tool",
+        email: str = "my_email@example.com",
+        chunk_size: int = 250,
+        max_tries: int = 100,
     ) -> None:
         """Initialization of the object.
 
@@ -27,6 +38,8 @@ class PubMed(object):
                         PMC (PubMed Central).
             - email     String, email of the user of the tool. This parameter
                         is not required but kindly requested by PMC (PubMed Central).
+            - chunk_size Integer, number of articles to be retrieved per request.
+            - max_tries Integer, maximum number of tries to retrieve chunk of articles.
 
         Returns:
             - None
@@ -35,6 +48,8 @@ class PubMed(object):
         # Store the input parameters
         self.tool = tool
         self.email = email
+        self.max_tries = max_tries
+        self.chunk_size = chunk_size
 
         # Keep track of the rate limit
         self._rateLimit = 3
@@ -59,12 +74,14 @@ class PubMed(object):
         article_ids = self._getArticleIds(query=query, max_results=max_results)
 
         # Get the articles themselves
-        articles = list(
-            [
-                self._getArticles(article_ids=batch)
-                for batch in batches(article_ids, 250)
-            ]
-        )
+        articles = []
+        for batch in tqdm(
+            batches(article_ids, self.chunk_size),
+            total=1 + len(article_ids) // self.chunk_size,
+            desc="Fetching articles from PubMed...",
+            disable=True,
+        ):
+            articles.append(self._getArticles(article_ids=batch))
 
         # Chain the batches back together and return the list
         return itertools.chain.from_iterable(articles)
@@ -106,7 +123,7 @@ class PubMed(object):
         self._requestsMade = [
             requestTime
             for requestTime in self._requestsMade
-            if requestTime > datetime.datetime.now() - datetime.timedelta(seconds=1)
+            if requestTime > datetime.datetime.now() - datetime.timedelta(seconds=5)
         ]
 
         # Return whether we've made more requests in the last second, than the rate limit
@@ -132,25 +149,35 @@ class PubMed(object):
 
         # Make sure the rate limit is not exceeded
         while self._exceededRateLimit():
+            sleep(0.1)
             pass
 
-        # Set the response mode
-        parameters["retmode"] = output
+        need_to_call, tries = True, 0
+        while need_to_call and tries < self.max_tries:
 
-        # Make the request to PubMed
-        response = requests.get(f"{BASE_URL}{url}", params=parameters)
+            # Set the response mode
+            parameters["retmode"] = output
 
-        # Check for any errors
-        response.raise_for_status()
+            # Make the request to PubMed
+            response = requests.get(f"{BASE_URL}{url}", params=parameters)
 
-        # Add this request to the list of requests made
-        self._requestsMade.append(datetime.datetime.now())
+            try:
+                # Check for any errors
+                response.raise_for_status()
+                need_to_call = False
+            except requests.HTTPError:
+                logger.debug(f"Requesting failed, now at {tries+1} attempts")
+                tries += 1
+                # Add this request to the list of requests made
+                self._requestsMade.append(datetime.datetime.now())
+                sleep(0.01)
+                continue
 
-        # Return the response
-        if output == "json":
-            return response.json()
-        else:
-            return response.text
+            # Return the response
+            if output == "json":
+                return response.json()
+            else:
+                return response.text
 
     def _getArticles(self: object, article_ids: list) -> list:
         """Helper method that batches a list of article IDs and retrieves the content.
@@ -170,7 +197,7 @@ class PubMed(object):
         response = self._get(
             url="/entrez/eutils/efetch.fcgi", parameters=parameters, output="xml"
         )
-
+        sleep(1)
         # Parse as XML
         root = xml.fromstring(response)
 
