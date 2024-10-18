@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pymed_paperscraper"
+dynamic = ["version"]
+description = "Python library for access to PubMed -- fork from archived PyMed"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Jannis Born", email = "jannis.born@gmx.de"}
+]
+keywords = ["PubMed", "Academics", "Science", "Publication", "Search"]
+classifiers = [
+    "Topic :: Utilities",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
+]
+requires-python = ">=3.7"
+
+dependencies = [
+    "requests>=2.20.0", "tqdm"
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/jannisborn/pymed"
+
+[tool.setuptools.packages.find]
+include = ["pymed*"]
+
+
+[tool.setuptools.dynamic]
+version = {attr = "pymed_paperscraper.__version__"}
