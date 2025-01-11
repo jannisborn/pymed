@@ -165,7 +165,9 @@ class PubMed(object):
                 response.raise_for_status()
                 need_to_call = False
             except ChunkedEncodingError as e:
-                logger.info(f"ChunkedEncodingError occurred for {url}: {e}")
+                logger.info(
+                    f"ChunkedEncodingError occurred for {parameters['id']}: {e}"
+                )
                 tries += 1
                 self._requestsMade.append(datetime.datetime.now())
                 sleep(0.01)
