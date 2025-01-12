@@ -7,6 +7,7 @@ from time import sleep
 from typing import Union
 
 import requests
+from requests.exceptions import ChunkedEncodingError
 from tqdm import tqdm
 
 from .article import PubMedArticle
@@ -154,17 +155,23 @@ class PubMed(object):
 
         need_to_call, tries = True, 0
         while need_to_call and tries < self.max_tries:
-
             # Set the response mode
             parameters["retmode"] = output
 
             # Make the request to PubMed
-            response = requests.get(f"{BASE_URL}{url}", params=parameters)
-
             try:
+                response = requests.get(f"{BASE_URL}{url}", params=parameters)
                 # Check for any errors
                 response.raise_for_status()
                 need_to_call = False
+            except ChunkedEncodingError as e:
+                logger.info(
+                    f"ChunkedEncodingError occurred for {parameters['id']}: {e}"
+                )
+                tries += 1
+                self._requestsMade.append(datetime.datetime.now())
+                sleep(0.01)
+                continue
             except requests.HTTPError:
                 logger.debug(f"Requesting failed, now at {tries+1} attempts")
                 tries += 1
@@ -248,7 +255,6 @@ class PubMed(object):
 
         # If not all articles are retrieved, continue to make requests untill we have everything
         while retrieved_count < total_result_count and retrieved_count < max_results:
-
             # Calculate a cut off point based on the max_results parameter
             if (max_results - retrieved_count) < parameters["retmax"]:
                 parameters["retmax"] = max_results - retrieved_count
