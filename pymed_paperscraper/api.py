@@ -166,14 +166,25 @@ class PubMed(object):
                 need_to_call = False
             except ChunkedEncodingError as e:
                 logger.info(
-                    f"ChunkedEncodingError occurred for {parameters['id']}: {e}"
+                    f"ChunkedEncodingError: {e}.\tNow at {tries+1} attempts for {parameters['id']}: "
                 )
                 tries += 1
                 self._requestsMade.append(datetime.datetime.now())
                 sleep(0.01)
                 continue
-            except requests.HTTPError:
-                logger.debug(f"Requesting failed, now at {tries+1} attempts")
+            except requests.HTTPError as e:
+                logger.info(
+                    f"HTTPError request error: {e}.\tNow at {tries+1} attempts for {parameters['id']}: "
+                )
+                tries += 1
+                # Add this request to the list of requests made
+                self._requestsMade.append(datetime.datetime.now())
+                sleep(0.01)
+                continue
+            except ConnectionError as e:
+                logger.info(
+                    f"ConnectionError: {e}.\tNow at {tries+1} attempts for {parameters['id']}: "
+                )
                 tries += 1
                 # Add this request to the list of requests made
                 self._requestsMade.append(datetime.datetime.now())
