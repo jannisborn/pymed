@@ -7,8 +7,9 @@ from time import sleep
 from typing import Union
 
 import requests
-from requests.exceptions import ChunkedEncodingError
+from requests.exceptions import ChunkedEncodingError, ConnectionError, HTTPError
 from tqdm import tqdm
+from urllib3.exceptions import ProtocolError
 
 from .article import PubMedArticle
 from .book import PubMedBookArticle
@@ -164,29 +165,18 @@ class PubMed(object):
                 # Check for any errors
                 response.raise_for_status()
                 need_to_call = False
-            except ChunkedEncodingError as e:
+            except (
+                ConnectionError,
+                HTTPError,
+                ChunkedEncodingError,
+                OSError,
+                ProtocolError,
+            ) as e:
+                error_type = type(e).__name__
                 logger.info(
-                    f"ChunkedEncodingError: {e}.\tNow at {tries+1} attempts for {parameters['id']}: "
+                    f"{error_type}: {e}.\tNow at {tries+1} attempts for {parameters['id']}: "
                 )
                 tries += 1
-                self._requestsMade.append(datetime.datetime.now())
-                sleep(0.01)
-                continue
-            except requests.HTTPError as e:
-                logger.info(
-                    f"HTTPError request error: {e}.\tNow at {tries+1} attempts for {parameters['id']}: "
-                )
-                tries += 1
-                # Add this request to the list of requests made
-                self._requestsMade.append(datetime.datetime.now())
-                sleep(0.01)
-                continue
-            except ConnectionError as e:
-                logger.info(
-                    f"ConnectionError: {e}.\tNow at {tries+1} attempts for {parameters['id']}: "
-                )
-                tries += 1
-                # Add this request to the list of requests made
                 self._requestsMade.append(datetime.datetime.now())
                 sleep(0.01)
                 continue
