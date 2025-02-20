@@ -173,19 +173,20 @@ class PubMed(object):
                 ProtocolError,
             ) as e:
                 error_type = type(e).__name__
+                tolog = "term" if "term" in parameters.keys() else "id"
                 logger.info(
-                    f"{error_type}: {e}.\tNow at {tries+1} attempts for {parameters['id']}: "
+                    f"{error_type}: {e}.\tNow at {tries+1} attempts for {parameters[tolog]}: "
                 )
                 tries += 1
                 self._requestsMade.append(datetime.datetime.now())
                 sleep(0.01)
                 continue
 
-            # Return the response
-            if output == "json":
-                return response.json()
-            else:
-                return response.text
+        # Return the response
+        if output == "json":
+            return response.json()
+        else:
+            return response.text
 
     def _getArticles(self: object, article_ids: list) -> list:
         """Helper method that batches a list of article IDs and retrieves the content.
