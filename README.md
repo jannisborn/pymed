@@ -28,6 +28,10 @@ pubmed = PubMed(tool="MyTool", email="my@email.address")
 results = pubmed.query("Some query", max_results=500)
 ```
 
+## Bugfixes compared to archived [`pymed`](https://github.com/gijswobben/pymed):
+- Article IDs are correctly extracted [`pymed#22`](https://github.com/gijswobben/pymed/issues/22)
+- Automatic retries if API is unresponsive/overloaded. Support for `max_tries` in `PubMed` class.
+
 ## Notes on the API
 The original documentation of the PubMed API can be found here: [PubMed Central](https://www.ncbi.nlm.nih.gov/pmc/tools/developers/). PubMed Central kindly requests you to:
 
@@ -35,3 +39,10 @@ The original documentation of the PubMed API can be found here: [PubMed Central]
 > - Include two parameters that help to identify your service or application to our servers
 >   * _tool_ should be the name of the application, as a string value with no internal spaces, and
 >   * _email_ should be the e-mail address of the maintainer of the tool, and should be a valid e-mail address.
+
+## Citation
+If you use `pymed_paperscraper` in your work, please cite:
+```bib
+(Citation follows)
+```
+
