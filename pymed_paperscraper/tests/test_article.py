@@ -8,5 +8,4 @@ def test_unique_id():
 
 	for r in results:
 		ids = r.pubmed_id.strip().split("\n")
-		print('org',r.pubmed_id,  'IDS', ids)
 		assert len(ids) == 1
