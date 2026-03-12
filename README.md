@@ -31,6 +31,7 @@ results = pubmed.query("Some query", max_results=500)
 ## Bugfixes compared to archived [`pymed`](https://github.com/gijswobben/pymed):
 - Article IDs are correctly extracted [`pymed#22`](https://github.com/gijswobben/pymed/issues/22)
 - Automatic retries if API is unresponsive/overloaded. Support for `max_tries` in `PubMed` class.
+- Titles and abstracts no longer get truncated when PubMed XML contains inline formatting tags such as italics.
 
 ## Notes on the API
 The original documentation of the PubMed API can be found here: [PubMed Central](https://www.ncbi.nlm.nih.gov/pmc/tools/developers/). PubMed Central kindly requests you to:
@@ -45,4 +46,3 @@ If you use `pymed_paperscraper` in your work, please cite:
 ```bib
 (Citation follows)
 ```
-
