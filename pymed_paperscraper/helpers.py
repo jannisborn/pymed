@@ -37,6 +37,10 @@ def getContent(
         - text      Str, text in the XML node.
     """
 
+    # Return the default if the parent element itself is missing
+    if element is None:
+        return default
+
     # Find the path in the element
     result = element.findall(path)
 
@@ -46,4 +50,10 @@ def getContent(
 
     # Extract the text and return it
     else:
-        return separator.join([sub.text for sub in result if sub.text is not None])
+        values = []
+        for sub in result:
+            text = "".join(sub.itertext())
+            if text:
+                values.append(text)
+
+        return separator.join(values)
